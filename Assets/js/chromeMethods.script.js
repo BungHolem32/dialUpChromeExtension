@@ -5,13 +5,19 @@
 (function(){
     window.cm = {
         getParams: function(callback){
-            chrome.storage.sync.get({
-                'accountId': false,
-                'url': true
-            }, function(items){
+            var params = cm.getDefaultValues();
+            chrome.storage.sync.get(params, function(items){
                 callback(items)
             });
 
+        },
+        getDefaultValues: function(){
+            var fields = Array.prototype.slice.call(document.querySelectorAll('input[type="text"]'));
+            var params = {};
+            fields.map(function(field){
+                params[field.getAttribute('name')] = field.getAttribute('default')||true;
+            });
+            return params
         },
         setParams: function(fields){
             chrome.storage.sync.set(fields, function(items){
@@ -23,7 +29,6 @@
                     location.reload();
                 }, 2000);
             });
-
         },
         getParamsFromForm: function(){
             var inputs = Array.prototype.slice.call(document.querySelectorAll('.formOptions input[type="text"]'));

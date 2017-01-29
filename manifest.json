@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Dialer Extension",
+  "description": "Dialer Extension app",
+  "version": "1.0",
+  "background": {
+    "scripts": [
+      "Assets/bower_components/jquery/dist/jquery.js",
+      "Assets/bower_components/bootstrap/dist/js/bootstrap.js",
+      "Assets/js/webSocket.js",
+      "Assets/js/chromeMethods.js",
+      "Assets/js/background.js",
+      "Assets/js/popup.script.js"
+    ]
+  },
+  "browser_action": {
+    "name": "click to listen for socket"
+  },
+  "permissions": [
+    "activeTab",
+    "https://ajax.googleapis.com/",
+    "storage",
+    "tabs"
+  ],
+  "options_page": "/Assets/templates/options.template.html"
+}

@@ -51,7 +51,7 @@
             this.writeToScreen('RESPONSE: ' + evt.data);
             console.log(evt.data);
             var data = JSON.parse(evt.data);
-            if(data['extension']==items['extension']){
+            if(data['exten']==items['exten']){
 
                 if(cm.tabId){
                     cm.updateTab(cm.tabId,items,data);

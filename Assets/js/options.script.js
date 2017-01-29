@@ -14,18 +14,18 @@
     var form = $('.formOptions');
     form.validate({
         rules: {
-            extension: {
-                required: true,
+            exten: {
+                required: true
             },
             socketUrl: {
                 required: true
             },
             apiUrl:{
-                require:true
+                required:true
             }
         },
         messages: {
-            extension: {
+            exten: {
                 required: "you must insert account id "
             },
             socketUrl: {

@@ -6,6 +6,9 @@
     window.cm = {
         getParams: function(callback){
             var params = cm.getDefaultValues();
+            if(Object.keys(params).length < 1){
+                params = null;
+            }
             chrome.storage.sync.get(params, function(items){
                 callback(items)
             });
@@ -14,6 +17,7 @@
         getDefaultValues: function(){
             var fields = Array.prototype.slice.call(document.querySelectorAll('input[type="text"]'));
             var params = {};
+
             fields.map(function(field){
                 params[field.getAttribute('name')] = field.getAttribute('default')||true;
             });
@@ -46,6 +50,36 @@
                 console.log(document.querySelector("#" + name));
                 document.querySelector("#" + name).value = items[name];
             });
+        },
+        updateIcons: function(iconImg){
+            var file = "/Assets/img/" + iconImg + ".png";
+            chrome.browserAction.setIcon({path: file});
+        },
+        initiateOnLoad: function(data, items){
+            chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
+
+                if(info.status!="complete"){
+                    return false;
+                }
+
+                $.get("http://" + items.apiUrl, {
+                    extension: data['exten'],
+                    number: data['phone']
+                }).done(function(data){
+                    console.log(data);
+                })
+
+            });
+        },
+        updateTab: function(id, items, data){
+
+
+            $(chrome.tabs.get(id, function(tab){
+                chrome.tabs.update(id, {url: 'http://' + data.url}, function(){
+                })
+            }));
+
         }
+
     };
 })();

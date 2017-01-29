@@ -14,27 +14,22 @@
     var form = $('.formOptions');
     form.validate({
         rules: {
-            extension: {
+            accountId: {
                 required: true,
+                digits: true
             },
-            socketUrl: {
+            url: {
                 required: true
-            },
-            apiUrl:{
-                require:true
             }
         },
         messages: {
-            extension: {
-                required: "you must insert account id "
+            accountId: {
+                required: "you must insert account id ",
+                digits: "you must insert only digits"
             },
-            socketUrl: {
+            url: {
                 required: "you must insert valid socket url"
-            },
-            apiUrl:{
-                required:"you must insert valid apiUrl"
             }
-
         },
 
         submitHandler: function(form){

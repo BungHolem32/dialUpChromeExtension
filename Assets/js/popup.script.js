@@ -5,6 +5,6 @@
 (function(){
     var loc = location.hash;
     loc = loc.replace('#', '');
-    document.querySelector('.message').innerHTML = loc;
+    $('.message').text(loc);
 })();
 

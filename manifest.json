@@ -7,10 +7,9 @@
     "scripts": [
       "Assets/bower_components/jquery/dist/jquery.js",
       "Assets/bower_components/bootstrap/dist/js/bootstrap.js",
-      "Assets/js/webSocket.script.js",
-      "Assets/js/chromeMethods.script.js",
-      "Assets/js/background.script.js",
-      "Assets/js/popup.script.js"
+      "Assets/js/webSocket.js",
+      "Assets/js/chromeMethods.js",
+      "Assets/js/background.js"
     ]
   },
   "browser_action": {

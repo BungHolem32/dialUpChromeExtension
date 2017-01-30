@@ -5,12 +5,9 @@
   "version": "1.0",
   "background": {
     "scripts": [
-      "Assets/bower_components/jquery/dist/jquery.js",
-      "Assets/bower_components/bootstrap/dist/js/bootstrap.js",
       "Assets/js/webSocket.script.js",
       "Assets/js/chromeMethods.script.js",
-      "Assets/js/background.script.js",
-      "Assets/js/popup.script.js"
+      "Assets/js/background.script.js"
     ]
   },
   "browser_action": {
@@ -18,7 +15,7 @@
   },
   "permissions": [
     "activeTab",
-    "https://ajax.googleapis.com/",
+    "http://172.10.170.20/*",
     "storage",
     "tabs"
   ],

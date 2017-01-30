@@ -20,8 +20,8 @@
             socketUrl: {
                 required: true
             },
-            apiUrl:{
-                required:true
+            apiUrl: {
+                required: true
             }
         },
         messages: {
@@ -31,19 +31,26 @@
             socketUrl: {
                 required: "you must insert valid socket url"
             },
-            apiUrl:{
-                required:"you must insert valid apiUrl"
+            apiUrl: {
+                required: "you must insert valid apiUrl"
             }
 
         },
 
         submitHandler: function(form){
             var fields = window.cm.getParamsFromForm(form);
-            window.cm.setParams(fields);
+            window.cm.setParams(fields, function(){
+                var feedback = document.querySelector('.feedback');
+                feedback.innerHTML = 'Setting saved';
+                setTimeout(function(){
+                    feedback.innerHTML = '';
+                    location.reload();
+                }, 2000);
+            });
         }
     });
 
-    $(document).bind('DOMContentLoaded', function(){
+    document.addEventListener('DOMContentLoaded',function(){
         cm.getParams(cm.setParamsToForm);
     });
 

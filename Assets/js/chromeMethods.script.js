@@ -12,27 +12,20 @@
             chrome.storage.sync.get(params, function(items){
                 callback(items)
             });
-
+        },
+        setParams: function(fields, callback){
+            chrome.storage.sync.set(fields, function(/*items*/){
+                callback();
+            });
         },
         getDefaultValues: function(){
             var fields = Array.prototype.slice.call(document.querySelectorAll('input[type="text"]'));
             var params = {};
 
             fields.map(function(field){
-                params[field.getAttribute('name')] = field.getAttribute('default')||true;
+                params[field.getAttribute('name')] = field.getAttribute('data-default')||true;
             });
             return params
-        },
-        setParams: function(fields){
-            chrome.storage.sync.set(fields, function(items){
-                // Notify that we saved.
-                var feedback = document.querySelector('.feedback');
-                feedback.innerHTML = 'Setting saved';
-                setTimeout(function(){
-                    feedback.innerHTML = '';
-                    location.reload();
-                }, 2000);
-            });
         },
         getParamsFromForm: function(){
             var inputs = Array.prototype.slice.call(document.querySelectorAll('.formOptions input[type="text"]'));
@@ -43,6 +36,7 @@
             });
             return fields;
         },
+
         setParamsToForm: function(items){
             var inputs = Array.prototype.slice.call(document.querySelectorAll('.formOptions input[type="text"]'));
             inputs.map(function(field){
@@ -51,35 +45,90 @@
                 document.querySelector("#" + name).value = items[name];
             });
         },
+
         updateIcons: function(iconImg){
             var file = "/Assets/img/" + iconImg + ".png";
             chrome.browserAction.setIcon({path: file});
         },
-        initiateOnLoad: function(data, items){
+
+        initiateTabOnLoad: function(message, items /*,tabId*/){
             chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
 
-                if(info.status!="complete"){
-                    return false;
+                    if(websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&cm.tabId==tab.id){
+                        if(info.status!='complete'){
+                            return false;
+                        } else{
+                            var url = items.apiUrl + "?exten=" + encodeURI(message.exten) + "&number=" + message.number;
+
+                            cm.makeNewAjaxCall('GET', url, null, cm.getAjaxSuccessCallback, cm.getAjaxErrorMessages, false);
+
+
+                            // cm.makeAjaxCall(apiData);
+                        }
+                    }
                 }
-
-                $.get("http://" + items.apiUrl, {
-                    extension: data['exten'],
-                    number: data['phone']
-                }).done(function(data){
-                    console.log(data);
-                })
-
-            });
+            );
         },
+
+        makeNewAjaxCall: function(method, url, params, success, error, test){
+
+            url = test ? 'http://localhost/errorPage.php' : url;
+
+            var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+
+            xhr.open(method, url, true);
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState==4){
+                    if(xhr.status==200||xhr.status==0){
+                        success(xhr.responseText);
+                        websocket.close();
+                    } else{
+                        error(xhr, xhr.status);
+                    }
+                }
+            };
+            xhr.onerror = function(){
+                error(xhr, xhr.status);
+            };
+            xhr.send(params);
+        },
+
+        getAjaxSuccessCallback: function(response){
+            alert('response: ' + response);
+        }
+        ,
+        getAjaxErrorMessages: function(xhr, status){
+
+            switch(status){
+                case 404:
+                    alert('Unknown extension');
+                    break;
+                case 500:
+                    alert('server error');
+                    break;
+                case 0:
+                    alert('Request aborted: Unknown extension');
+                    break;
+                default:
+                    alert('unknown error');
+            }
+        },
+
         updateTab: function(id, items, data){
 
-
-            $(chrome.tabs.get(id, function(tab){
-                chrome.tabs.update(id, {url: 'http://' + data.url}, function(){
+            chrome.tabs.get(id, function(/*tab*/){
+                chrome.tabs.update(id, {url: "http://" + data.url}, function(){
                 })
-            }));
+            });
+        },
 
+        clearChromeStorage: function(){
+            chrome.storage.local.clear(function(){
+                var error = chrome.runtime.lastError;
+                if(error){
+                    console.error(error);
+                }
+            });
         }
-
     };
 })();

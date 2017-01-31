@@ -3,12 +3,14 @@
  */
 
 (function(){
-    window.cm = {
+
+    window._cm = {
         getParams: function(callback){
-            var params = cm.getDefaultValues();
+            var params = _cm.getDefaultValues();
             if(Object.keys(params).length < 1){
                 params = null;
             }
+            //noinspection JSUnresolvedVariable
             chrome.storage.sync.get(params, function(items){
                 callback(items)
             });
@@ -46,24 +48,24 @@
             });
         },
 
-        updateIcons: function(iconImg){
-            var file = "/Assets/img/" + iconImg + ".png";
+        updateIcons: function(iconNumber){
+            var file = "/Assets/img/" + 'icon-' + iconNumber + ".png";
             chrome.browserAction.setIcon({path: file});
         },
 
         initiateTabOnLoad: function(message, items /*,tabId*/){
             chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
 
-                    if(websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&cm.tabId==tab.id){
+                    if(_websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&_cm.tabId==tab.id){
                         if(info.status!='complete'){
                             return false;
                         } else{
-                            var url = items.apiUrl + "?exten=" + encodeURI(message.exten) + "&number=" + message.number;
+                            var url = items.apiUrl + "?exten=" + encodeURI(message.extension) + "&number=" + message.phone;
 
-                            cm.makeNewAjaxCall('GET', url, null, cm.getAjaxSuccessCallback, cm.getAjaxErrorMessages, false);
+                            _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false);
 
 
-                            // cm.makeAjaxCall(apiData);
+                            // _cm.makeAjaxCall(apiData);
                         }
                     }
                 }
@@ -81,7 +83,7 @@
                 if(xhr.readyState==4){
                     if(xhr.status==200||xhr.status==0){
                         success(xhr.responseText);
-                        websocket.close();
+                        _websocket.close();
                     } else{
                         error(xhr, xhr.status);
                     }

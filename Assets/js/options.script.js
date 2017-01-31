@@ -38,8 +38,8 @@
         },
 
         submitHandler: function(form){
-            var fields = window.cm.getParamsFromForm(form);
-            window.cm.setParams(fields, function(){
+            var fields = window._cm.getParamsFromForm(form);
+            window._cm.setParams(fields, function(){
                 var feedback = document.querySelector('.feedback');
                 feedback.innerHTML = 'Setting saved';
                 setTimeout(function(){
@@ -51,7 +51,7 @@
     });
 
     document.addEventListener('DOMContentLoaded',function(){
-        cm.getParams(cm.setParamsToForm);
+        _cm.getParams(_cm.setParamsToForm);
     });
 
 })();

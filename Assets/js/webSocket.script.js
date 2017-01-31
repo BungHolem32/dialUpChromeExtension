@@ -4,61 +4,72 @@
 (function(){
 
     window.output = '';
-    window.websocket = window.websocket ? window.websocket : {};
-    window.ws = {
-        init: function(items){
-            ws.items = items;
-            if(websocket.readyState==1){
-                websocket.close();
+    window._websocket = window._websocket ? window._websocket : {};
+    window._ws = {
+
+        init: function(settings){
+            _ws.settings = settings;
+
+            if(_websocket.readyState==1){
+                _websocket.close();
+                return false;
+            }
+            if(!settings.socketUrl){
+                settings.socketUrl = 'ww.testNotWork.com';
+            }
+            try{
+                window._websocket = new WebSocket(settings.socketUrl);
+                var timeOutTillIdle = setTimeout(function(){
+                    _ws.disconnectFromWebSocketOnIdle()
+                }, 20000);
+
+            } catch(e){
+                _cm.updateIcons('1');
+                alert('Please insert valid url socket');
                 return false;
             }
 
-            if(!items.socketUrl){
-                items.socketUrl = 'ww.testNotWork.com';
-            }
-            window.websocket = new WebSocket(items.socketUrl);
-            var waitForResponse = setTimeout(ws.disconnectFromWebSocketOnIdle, 20000);
-
-
-            if(typeof websocket=='object'){
-                websocket.onopen = function(evt){
-                    ws.onOpen(evt, websocket, this)
+            if(typeof _websocket=='object'){
+                _websocket.onopen = function(evt){
+                    _ws.onOpen(evt, _websocket, this)
                 };
-                websocket.onclose = function(evt){
-                    ws.onClose(evt)
+                _websocket.onclose = function(evt){
+                    _ws.onClose(evt)
                 };
-                websocket.onmessage = function(evt){
-                    ws.onMessage(evt, this, items, waitForResponse)
+                _websocket.onmessage = function(evt){
+                    _ws.onMessage(evt, this, settings, timeOutTillIdle)
                 };
-                websocket.onerror = function(evt){
-                    ws.onError(evt, this)
+                _websocket.onerror = function(evt){
+                    _ws.onError(evt, this)
                 };
             }
         },
 
-        onOpen: function(evt, websocket){
+        onOpen: function(evt, _websocket){
             this.writeToScreen("CONNECTED");
-            this.doSend("WebSocket rocks", websocket);
+            this.doSend("WebSocket rocks", _websocket);
         },
 
         onClose: function(/*evt*/){
-            cm.updateIcons('icon-1');
+            _cm.updateIcons('1');
             this.writeToScreen("DISCONNECTED");
         },
 
 
-        onMessage: function(evt, websocket, items, timeOut){
+        onMessage: function(evt, _websocket, settings, timeOutTillIdle){
             this.writeToScreen('RESPONSE: ' + evt.data);
-            console.log(evt.data);
             var data = JSON.parse(evt.data);
             if(data.url.indexOf('http://')!= -1){
                 data.url = data.url.replace("http://", '');
             }
 
-            if(data['exten']==items['exten']){
-                clearTimeout(timeOut);
-                if(cm.tabId){
-                    cm.updateTab(cm.tabId, items, data);
+            if(data['extension']==settings['extension']){
+
+                //if some connection was made cancel the timeout
+                clearTimeout(timeOutTillIdle);
+
+                if(_cm.tabId){
+                    _cm.updateTab(_cm.tabId, settings, data);
                     return false;
                 }
 
@@ -66,24 +77,24 @@
                     url: "http://" + data.url,
                     active: true
                 }, function(tab){
-                    cm.initiateTabOnLoad(data, items, tab.id);
-                    cm.tabId = tab.id;
+                    _cm.initiateTabOnLoad(data, settings, tab.id);
+                    _cm.tabId = tab.id;
                 });
             }
         },
 
         onError: function(evt, message){
-            if(websocket.readyState==3){
+            if(_websocket.readyState==3){
                 alert('Cannot connect to Socket Server');
-                cm.updateIcons('icon-1');
+                _cm.updateIcons('1');
             }
             this.writeToScreen('ERROR: ' + message);
         },
 
-        doSend: function(message, websocket){
+        doSend: function(message, _websocket){
             this.writeToScreen("SENT: " + message);
-            websocket.send(message);
-            cm.updateIcons('icon-3')
+            _websocket.send(message);
+            _cm.updateIcons('3')
         },
 
         writeToScreen: function(message){
@@ -92,12 +103,10 @@
             pre.innerHTML = message;
         },
         disconnectFromWebSocketOnIdle: function(){
-            websocket.close();
-            // cm.setParams({exten: 'error'}, function(){
-            //     console.log('exten set to error');
-            // });
+            _websocket.close();
+
             alert('Cannot open CRM.');
-            cm.updateIcons('icon-1');
+            _cm.updateIcons('1');
         }
 
     }

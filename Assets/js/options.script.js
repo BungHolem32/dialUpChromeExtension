@@ -58,6 +58,16 @@
             window._cm.setParams(fields, function(){
                 var feedback = document.querySelector('.feedback');
                 feedback.innerHTML = 'Setting saved';
+
+                if(fields['disableOptions']){
+                    _cm.setPopup('./Assets/templates/popup.template.html');
+                    _cm.updateIcons('5');
+                } else{
+                    _cm.setPopup('');
+                    _cm.updateIcons('1');
+                }
+
+
                 setTimeout(function(){
                     feedback.innerHTML = '';
                     location.reload();

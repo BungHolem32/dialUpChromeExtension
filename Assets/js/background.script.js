@@ -8,6 +8,7 @@
             //get the new Params
             _cm.getParams(_cm.checkIfNeedToListen);
         });
+
     });
 
     //ON REMOVE TAB

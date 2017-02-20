@@ -28,7 +28,7 @@
 
             } catch(e){
                 var that = this;
-                that.onerror();
+                that.onError();
                 return false;
             }
 
@@ -97,6 +97,10 @@
                 var that = this;
                 _cm.updateIcons('1').then(function(){
                     alert('Cannot connect to Socket Server');
+                });
+            } else{
+                _cm.updateIcons('1').then(function(){
+                    alert('Some unknown error occurred');
                 });
             }
         },

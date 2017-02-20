@@ -3,6 +3,8 @@
  */
 
 (function(){
+
+
     var cm = {
 
         disableButtonSelector: 'disableOptions',
@@ -17,13 +19,13 @@
             });
         },
 
-        createPopupList: function(popup){
+        setPopup: function(popup){
             chrome.browserAction.setPopup({popup: popup})
         },
         checkIfNeedToListen: function(items){
             if(items[this.disableButtonSelector]){
-                if(chrome.extension.getViews({type: "popup"}).length==0){
-                    _cm.createPopupList('./Assets/templates/popup.template.html');
+                if(chrome.extension.getViews({type: "popup"})==[]){
+                    _cm.popupList('./Assets/templates/popup.template.html');
                 }
             } else{
                 console.log(chrome.extension.getViews({type: "popup"}));

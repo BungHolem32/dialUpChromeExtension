@@ -4,12 +4,11 @@
 
 (function(){
 
-    $('.listenerBtn').on('click', function(){
-        _cm.updateIcons('2').then(function(){
-            //get the new Params
-            _cm.getParams(_ws.init);
-        });
-    })
+    //WAIT FOR ICON CLICK
+    chrome.browserAction.onClicked.addListener(function(){
+        _cm.getParams(_cm.checkIfNeedToListen)
+
+    });
 
     //ON REMOVE TAB
     chrome.tabs.onRemoved.addListener(function(tabId/*, removeInfo*/){

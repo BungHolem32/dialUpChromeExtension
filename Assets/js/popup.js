@@ -1,14 +1,15 @@
-(function(){
-    //ON-LOAD SET ICON TO SAD-FACE(DISCONNECTED)
-    _cm.updateIcons('1');
+/**
+ * Created by ilanv on 20/02/2017.
+ */
 
-    //WAIT FOR ICON CLICK
-    chrome.browserAction.onClicked.addListener(function(){
+(function(){
+
+    $('.listenerBtn').on('click', function(){
         _cm.updateIcons('2').then(function(){
             //get the new Params
-            _cm.getParams(_cm.checkIfNeedToListen);
+            _cm.getParams(_ws.init);
         });
-    });
+    })
 
     //ON REMOVE TAB
     chrome.tabs.onRemoved.addListener(function(tabId/*, removeInfo*/){

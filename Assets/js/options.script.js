@@ -2,9 +2,25 @@
  * Created by root on 25/01/17.
  */
 (function(){
+
     //ON LOAD POPUP THE MODAL
     var button = $('.ModalButton');
     button.hide().click();
+
+    var disableCheckbox = $('.disableOptions');
+
+    disableCheckbox.on('click', function(){
+
+        var checkboxButton = this;
+        $('.formOptions input[type="text"]').each(function(key, elem){
+            if($(checkboxButton).is(":checked")){
+                $(elem).attr('disabled', 'disabled');
+            }
+            else{
+                $(elem).removeAttr('disabled');
+            }
+        });
+    });
 
     $('.close').on('click', function(){
         window.close();
@@ -50,7 +66,7 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded',function(){
+    document.addEventListener('DOMContentLoaded', function(){
         _cm.getParams(_cm.setParamsToForm);
     });
 

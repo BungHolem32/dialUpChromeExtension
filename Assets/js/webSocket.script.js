@@ -3,29 +3,32 @@
  */
 (function(){
 
-    window.output = '';
     window._websocket = window._websocket ? window._websocket : {};
     window._ws = {
 
         init: function(settings){
-            _ws.settings = settings;
+            settings.socketUrl = !settings.socketUrl ? 'ww.testNotWork.com' : settings.socketUrl;
+            this.timeout = undefined;
 
-            if(_websocket.readyState==1){
-                _websocket.close();
-                return false;
-            }
-            if(!settings.socketUrl){
-                settings.socketUrl = 'ww.testNotWork.com';
-            }
             try{
+                if(window._websocket.readyState==1){
+                    _websocket.close();
+                    clearTimeout(_ws.timeout);
+                    return false;
+                }
+
                 window._websocket = new WebSocket(settings.socketUrl);
-                var timeOutTillIdle = setTimeout(function(){
-                    _ws.disconnectFromWebSocketOnIdle()
-                }, 20000);
+
+                if(window._websocket.readyState==1){
+                    _ws.timeout = setTimeout(function(){
+                        var message = "Cannot open CRM.";
+                        _ws.onIdle(message)
+                    }, 20000);
+                }
 
             } catch(e){
-                _cm.updateIcons('1');
-                alert('Please insert valid url socket');
+                var that = this;
+                that.onerror();
                 return false;
             }
 
@@ -33,11 +36,11 @@
                 _websocket.onopen = function(evt){
                     _ws.onOpen(evt, _websocket, this)
                 };
-                _websocket.onclose = function(evt){
-                    _ws.onClose(evt)
+                _websocket.onclose = function(evt, message){
+                    _ws.onClose(evt, message)
                 };
                 _websocket.onmessage = function(evt){
-                    _ws.onMessage(evt, this, settings, timeOutTillIdle)
+                    _ws.onMessage(evt, this, settings, _ws.timeout)
                 };
                 _websocket.onerror = function(evt){
                     _ws.onError(evt, this)
@@ -46,25 +49,31 @@
         },
 
         onOpen: function(evt, _websocket){
-            this.writeToScreen("CONNECTED");
-            this.doSend("WebSocket rocks", _websocket);
+            var that = this;
+            _cm.updateIcons('3').then(function(){
+                console.log('CONNECTED');
+                that.doSend("WebSocket rocks", _websocket);
+            });
+
         },
 
-        onClose: function(/*evt*/){
-            _cm.updateIcons('1');
-            this.writeToScreen("DISCONNECTED");
+        onClose: function(evt, message){
+            var that = this;
+            _cm.updateIcons('1').then(function(){
+                console.log('DISCONNECTED');
+                if(message){
+                    alert(message)
+                }
+            });
         },
-
 
         onMessage: function(evt, _websocket, settings, timeOutTillIdle){
-            this.writeToScreen('RESPONSE: ' + evt.data);
             var data = JSON.parse(evt.data);
             if(data.url.indexOf('http://')!= -1){
                 data.url = data.url.replace("http://", '');
             }
 
             if(data['extension']==settings['extension']){
-
                 //if some connection was made cancel the timeout
                 clearTimeout(timeOutTillIdle);
 
@@ -85,29 +94,21 @@
 
         onError: function(evt, message){
             if(_websocket.readyState==3){
-                alert('Cannot connect to Socket Server');
-                _cm.updateIcons('1');
+                var that = this;
+                _cm.updateIcons('1').then(function(){
+                    alert('Cannot connect to Socket Server');
+                });
             }
-            this.writeToScreen('ERROR: ' + message);
         },
 
         doSend: function(message, _websocket){
-            this.writeToScreen("SENT: " + message);
+            console.log("SENT: " + message);
             _websocket.send(message);
-            _cm.updateIcons('3')
+
         },
 
-        writeToScreen: function(message){
-            var pre = document.createElement("p");
-            pre.style.wordWrap = "break-word";
-            pre.innerHTML = message;
-        },
-        disconnectFromWebSocketOnIdle: function(){
-            _websocket.close();
-
-            alert('Cannot open CRM.');
-            _cm.updateIcons('1');
+        onIdle: function(message){
+            _ws.onClose(null, message);
         }
-
     }
-})();
+})(window);

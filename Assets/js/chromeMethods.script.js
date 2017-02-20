@@ -3,57 +3,101 @@
  */
 
 (function(){
+    var cm = {
 
-    window._cm = {
+        disableButtonSelector: 'disableOptions',
+
         getParams: function(callback){
             var params = _cm.getDefaultValues();
             if(Object.keys(params).length < 1){
                 params = null;
             }
-            //noinspection JSUnresolvedVariable
             chrome.storage.sync.get(params, function(items){
-                callback(items)
+                callback.call(cm, items);
             });
         },
+
+        createPopupList: function(popup){
+            chrome.browserAction.setPopup({popup: popup})
+        },
+        checkIfNeedToListen: function(items){
+            if(items[this.disableButtonSelector]){
+                if(chrome.extension.getViews({type: "popup"}).length==0){
+                    _cm.createPopupList('./Assets/templates/popup.template.html');
+                }
+            } else{
+                console.log(chrome.extension.getViews({type: "popup"}));
+                _ws.init(items);
+            }
+        },
+
         setParams: function(fields, callback){
+            /** @namespace chrome.storage */
             chrome.storage.sync.set(fields, function(/*items*/){
                 callback();
             });
         },
+
+
         getDefaultValues: function(){
-            var fields = Array.prototype.slice.call(document.querySelectorAll('input[type="text"]'));
+            var fields = _cm.getInputsArray();
             var params = {};
 
             fields.map(function(field){
-                params[field.getAttribute('name')] = field.getAttribute('data-default')||true;
+
+                var name = field.getAttribute('name');
+                if(field.getAttribute('name')==this.disableButtonSelector){
+                    params[name] = document.getElementById(name).checked;
+                } else{
+                    params[name] = field.getAttribute('data-default')||'';
+                }
             });
             return params
         },
+
+
         getParamsFromForm: function(){
-            var inputs = Array.prototype.slice.call(document.querySelectorAll('.formOptions input[type="text"]'));
+            var inputs = _cm.getInputsArray();
+
             var fields = {};
             inputs.map(function(field){
                 var name = field.getAttribute('name');
-                fields[name] = field.value;
-            });
+                fields[name] = (name!=this.disableButtonSelector) ? field.value : ( !!(document.getElementById(name).checked) );
+            }.bind(cm));
             return fields;
         },
 
         setParamsToForm: function(items){
-            var inputs = Array.prototype.slice.call(document.querySelectorAll('.formOptions input[type="text"]'));
+            var inputs = _cm.getInputsArray();
+
             inputs.map(function(field){
                 var name = field.getAttribute('name');
-                console.log(document.querySelector("#" + name));
                 document.querySelector("#" + name).value = items[name];
-            });
+                if(name!=this.disableButtonSelector){
+                    document.querySelector("#" + name).disabled = items[this.disableButtonSelector]==true;
+                } else{
+                    if(field.value=="true"){
+                        document.querySelector("#" + name).checked = true;
+                    }
+                }
+            }.bind(_cm));
         },
 
         updateIcons: function(iconNumber){
-            var file = "/Assets/img/" + 'icon-' + iconNumber + ".png";
-            chrome.browserAction.setIcon({path: file});
+            return new Promise(function(resolve){
+
+                setTimeout(function(){
+                    var file = "/Assets/img/" + 'icon-' + iconNumber + ".png";
+                    //noinspection JSUnresolvedVariable
+                    chrome.browserAction.setIcon({path: file});
+                    resolve();
+                }, 200);
+            });
+
         },
 
         initiateTabOnLoad: function(message, items /*,tabId*/){
+            /** @namespace chrome.tabs.onUpdated */
             chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
 
                     if(_websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&_cm.tabId==tab.id){
@@ -117,7 +161,6 @@
         },
 
         updateTab: function(id, items, data){
-
             chrome.tabs.get(id, function(/*tab*/){
                 chrome.tabs.update(id, {url: "http://" + data.url}, function(){
                 })
@@ -125,12 +168,21 @@
         },
 
         clearChromeStorage: function(){
+            /** @namespace chrome.storage.local */
             chrome.storage.local.clear(function(){
+                /** @namespace chrome.runtime.lastError */
                 var error = chrome.runtime.lastError;
                 if(error){
                     console.error(error);
                 }
             });
+        },
+
+        getInputsArray: function(){
+            return Array.prototype.slice.call(document.querySelectorAll('input[type="text"],input[type="checkbox"]'));
         }
     };
+
+    window._cm = cm;
+
 })();

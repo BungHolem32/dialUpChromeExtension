@@ -6,7 +6,7 @@
     chrome.browserAction.onClicked.addListener(function(){
         _cm.updateIcons('2').then(function(){
             //get the new Params
-            _cm.getParams(_ws.init);
+            _cm.getParams(_ws.init,'input[type="text"],input[type="checkbox"]');
         });
 
     });

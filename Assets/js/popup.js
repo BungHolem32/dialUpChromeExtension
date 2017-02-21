@@ -38,11 +38,10 @@
                     "url": leadDetails['url'],
                     "phone": leadDetails['phone']
                 };
-                var message = JSON.stringify(_cm.generateMessage(params));
+                var message = JSON.stringify(_h.genObject(params));
 
-                if(_cm.checkIfYouNeedToUpdateOrCreateNewTab()){
+                if(_cm.tabId){
                     _cm.updateTab(_cm.tabId, leadDetails, setting).then(function(response){
-                        console.log(response);
                         chrome.tabs.sendMessage(_cm.tabId, message)
                     }).catch(function(e){
                         console.log(e);

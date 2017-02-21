@@ -57,7 +57,6 @@
         },
 
         onClose: function(evt, message){
-            var that = this;
             _cm.updateIcons('1').then(function(){
                 console.warn('DISCONNECTED');
                 if(message){
@@ -80,24 +79,23 @@
                     _cm.updateTab(_cm.tabId, data, settings)
                         .then(_cm.initiateTabOnLoad(data, settings, _cm.tabId))
                         .then(function(){
-                                var url = _cm.getUrl(settings['apiUrl'], settings['extension'], data['phone']);
-                                _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false)
+                                var url = _h.genUrl(settings['apiUrl'], settings['extension'], data['phone']);
+                                _h.makeAjaxCall('GET', url, null, _h.getAjaxSuccessCallback, _h.getAjaxErrorMessages, false)
                             }
                         );
                 } else{
                     _cm.createTab(data, settings)
                         .then(_cm.initiateTabOnLoad(data, settings, _cm.tabId))
                         .then(function(){
-                            var url = _cm.getUrl(settings['apiUrl'], settings['extension'], data['phone']);
-                            _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false)
+                            var url = _h.genUrl(settings['apiUrl'], settings['extension'], data['phone']);
+                            _h.makeAjaxCall('GET', url, null, _h.getAjaxSuccessCallback, _h.getAjaxErrorMessages, false)
                         });
                 }
 
             }
         },
 
-        onError: function(evt, message){
-            var that = this;
+        onError: function(/*evt, message*/){
             _cm.updateIcons('1').then(function(){
                 if(_websocket.readyState==3){
                     console.warn('Cannot connect to Socket Server');
@@ -105,8 +103,7 @@
                     console.warn('Some unknown error occurred');
                 }
             });
-        }
-        ,
+        },
 
         doSend: function(message, _websocket){
             console.info("SENT: " + message);

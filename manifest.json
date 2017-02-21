@@ -5,18 +5,25 @@
   "version": "1.0",
   "background": {
     "scripts": [
+      "Assets/js/helper.script.js",
       "Assets/js/webSocket.script.js",
       "Assets/js/chromeMethods.script.js",
       "Assets/js/background.script.js"
     ]
   },
-  "content_scripts" : [
+  "content_scripts": [
     {
-      "matches" : ["<all_urls>"],
-      "js" : [ "Assets/js/webSocket.script.js","Assets/js/chromeMethods.script.js", "Assets/js/tabListener.script.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "Assets/js/webSocket.script.js",
+        "Assets/js/helper.script.js",
+        "Assets/js/chromeMethods.script.js",
+        "Assets/js/tabListener.script.js"
+      ]
     }
   ],
-
   "browser_action": {
     "name": "click to listen for socket"
   },
@@ -28,6 +35,5 @@
     "tabs",
     "<all_urls>"
   ],
-
   "options_page": "/Assets/templates/options.template.html"
 }

@@ -5,7 +5,7 @@
 
     chrome.runtime.onMessage.addListener(function(message){
         message = JSON.parse(message);
-        var url = _cm.getUrl(message['apiUrl'], message['extension'], message['phone']);
-        _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false);
+        var url = _h.genUrl(message['apiUrl'], message['extension'], message['phone']);
+        _h.makeAjaxCall('GET', url, null, _h.getAjaxSuccessCallback, _h.getAjaxErrorMessages, false);
     })
 })();

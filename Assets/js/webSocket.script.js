@@ -27,8 +27,7 @@
                 }
 
             } catch(e){
-                var that = this;
-                that.onError();
+                _ws.onError();
                 return false;
             }
 
@@ -51,7 +50,7 @@
         onOpen: function(evt, _websocket){
             var that = this;
             _cm.updateIcons('3').then(function(){
-                console.log('CONNECTED');
+                console.info('CONNECTED');
                 that.doSend("WebSocket rocks", _websocket);
             });
 
@@ -60,9 +59,9 @@
         onClose: function(evt, message){
             var that = this;
             _cm.updateIcons('1').then(function(){
-                console.log('DISCONNECTED');
+                console.warn('DISCONNECTED');
                 if(message){
-                    alert(message)
+                    console.warn(message)
                 }
             });
         },
@@ -78,41 +77,47 @@
                 clearTimeout(timeOutTillIdle);
 
                 if(_cm.tabId){
-                    _cm.updateTab(_cm.tabId, settings, data);
-                    return false;
+                    _cm.updateTab(_cm.tabId, data, settings)
+                        .then(_cm.initiateTabOnLoad(data, settings, _cm.tabId))
+                        .then(function(){
+                                var url = _cm.getUrl(settings['apiUrl'], settings['extension'], data['phone']);
+                                _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false)
+                            }
+                        );
+                } else{
+                    _cm.createTab(data, settings)
+                        .then(_cm.initiateTabOnLoad(data, settings, _cm.tabId))
+                        .then(function(){
+                            var url = _cm.getUrl(settings['apiUrl'], settings['extension'], data['phone']);
+                            _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false)
+                        });
                 }
 
-                chrome.tabs.create({
-                    url: "http://" + data.url,
-                    active: true
-                }, function(tab){
-                    _cm.initiateTabOnLoad(data, settings, tab.id);
-                    _cm.tabId = tab.id;
-                });
             }
         },
 
         onError: function(evt, message){
-            if(_websocket.readyState==3){
-                var that = this;
-                _cm.updateIcons('1').then(function(){
-                    alert('Cannot connect to Socket Server');
-                });
-            } else{
-                _cm.updateIcons('1').then(function(){
-                    alert('Some unknown error occurred');
-                });
-            }
-        },
+            var that = this;
+            _cm.updateIcons('1').then(function(){
+                if(_websocket.readyState==3){
+                    console.warn('Cannot connect to Socket Server');
+                } else{
+                    console.warn('Some unknown error occurred');
+                }
+            });
+        }
+        ,
 
         doSend: function(message, _websocket){
-            console.log("SENT: " + message);
+            console.info("SENT: " + message);
             _websocket.send(message);
 
-        },
+        }
+        ,
 
         onIdle: function(message){
             _ws.onClose(null, message);
         }
     }
-})(window);
+})
+(window);

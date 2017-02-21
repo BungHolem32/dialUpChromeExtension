@@ -2,10 +2,10 @@
  * Created by Ilan vachtel on 25/01/17.
  */
 
-(function(){
+(function(window){
 
 
-    var cm = {
+    var chromeExtensionMethods = {
 
         disableButtonSelector: 'disableOptions',
 
@@ -14,23 +14,10 @@
             if(Object.keys(params).length < 1){
                 params = null;
             }
+            //pass default params (if theres already they will pass out)
             chrome.storage.sync.get(params, function(items){
-                callback.call(cm, items);
+                callback.call(chromeExtensionMethods, items);
             });
-        },
-
-        setPopup: function(popup){
-            chrome.browserAction.setPopup({popup: popup})
-        },
-        checkIfNeedToListen: function(items){
-            if(items[this.disableButtonSelector]){
-                if(chrome.extension.getViews({type: "popup"})==[]){
-                    _cm.popupList('./Assets/templates/popup.template.html');
-                }
-            } else{
-                console.log(chrome.extension.getViews({type: "popup"}));
-                _ws.init(items);
-            }
         },
 
         setParams: function(fields, callback){
@@ -40,10 +27,22 @@
             });
         },
 
+        setPopup: function(popup){
+            chrome.browserAction.setPopup({popup: popup})
+        },
 
         getDefaultValues: function(){
             var fields = _cm.getInputsArray();
             var params = {};
+            if(fields.length==0){
+                return {
+                    "socketUrl": true,
+                    "apiUrl": true,
+                    "extension": true,
+                    "disableButton": true
+
+                }
+            }
 
             fields.map(function(field){
 
@@ -57,25 +56,24 @@
             return params
         },
 
-
-        getParamsFromForm: function(){
+        getFormParams: function(){
             var inputs = _cm.getInputsArray();
 
             var fields = {};
             inputs.map(function(field){
                 var name = field.getAttribute('name');
                 fields[name] = (name!=this.disableButtonSelector) ? field.value : ( !!(document.getElementById(name).checked) );
-            }.bind(cm));
+            }.bind(chromeExtensionMethods));
             return fields;
         },
 
-        setParamsToForm: function(items){
+        setFormParams: function(items){
             var inputs = _cm.getInputsArray();
 
             inputs.map(function(field){
                 var name = field.getAttribute('name');
                 document.querySelector("#" + name).value = items[name];
-                if(name!=this.disableButtonSelector){
+                if(name!=this.disableButtonSelector&&name!='extension'){
                     document.querySelector("#" + name).disabled = items[this.disableButtonSelector]==true;
                 } else{
                     if(field.value=="true"){
@@ -95,27 +93,35 @@
                     resolve();
                 }, 200);
             });
-
         },
 
-        initiateTabOnLoad: function(message, items /*,tabId*/){
+        getUrl: function(apiUrl, extension, phone){
+            return apiUrl + "?exten=" + encodeURI(extension) + "&number=" + phone;
+        },
+
+        generateMessage: function(params){
+            var message = {};
+            Object.keys(params).forEach(function(key){
+                message[key] = params[key];
+            });
+            return message;
+        },
+
+
+        initiateTabOnLoad: function(message, items, tabId){
             /** @namespace chrome.tabs.onUpdated */
-            chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
-
-                    if(_websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&_cm.tabId==tab.id){
-                        if(info.status!='complete'){
-                            return false;
-                        } else{
-                            var url = items.apiUrl + "?exten=" + encodeURI(message.extension) + "&number=" + message.phone;
-
-                            _cm.makeNewAjaxCall('GET', url, null, _cm.getAjaxSuccessCallback, _cm.getAjaxErrorMessages, false);
-
-
-                            // _cm.makeAjaxCall(apiData);
+            return new Promise(function(resolve, reject){
+                chrome.tabs.onUpdated.addListener(function(tabid, info, tab){
+                        if(_websocket.readyState==1&&tab.url.indexOf(message.url)!= -1&&_cm.tabId==tab.id){
+                            if(info.status!='complete'){
+                            } else{
+                                resolve();
+                            }
                         }
                     }
-                }
-            );
+                );
+            });
+
         },
 
         makeNewAjaxCall: function(method, url, params, success, error, test){
@@ -142,31 +148,51 @@
         },
 
         getAjaxSuccessCallback: function(response){
-            alert('response: ' + response);
+            console.info('response: ' + response);
         }
         ,
         getAjaxErrorMessages: function(xhr, status){
 
             switch(status){
                 case 404:
-                    alert('Unknown extension');
+                    console.warn('Unknown extension');
                     break;
                 case 500:
-                    alert('server error');
+                    console.warn('server error');
                     break;
                 case 0:
-                    alert('Request aborted: Unknown extension');
+                    console.warn('Request aborted: Unknown extension');
                     break;
                 default:
-                    alert('unknown error');
+                    console.warn('unknown error');
             }
         },
 
-        updateTab: function(id, items, data){
-            chrome.tabs.get(id, function(/*tab*/){
-                chrome.tabs.update(id, {url: "http://" + data.url}, function(){
+        updateTab: function(id, data, settings){
+            return new Promise(function(resolve, reject){
+                chrome.tabs.get(id, function(){
+                    chrome.tabs.update(id, {url: "http://" + data.url}, function(){
+                        setTimeout(function(){
+                            return resolve();
+                        }, 2000)
+                    })
                 })
             });
+        },
+
+        createTab: function(data, settings){
+            return new Promise(function(resolve, reject){
+
+                chrome.tabs.create({
+                    url: "http://" + data.url,
+                    active: true
+                }, function(tab){
+                    _cm.tabId = tab.id;
+                    setTimeout(function(){
+                        return resolve(tab);
+                    }, 2000)
+                });
+            })
         },
 
         clearChromeStorage: function(){
@@ -175,16 +201,19 @@
                 /** @namespace chrome.runtime.lastError */
                 var error = chrome.runtime.lastError;
                 if(error){
-                    console.error(error);
+                    console.warn(error);
                 }
             });
         },
 
         getInputsArray: function(){
             return Array.prototype.slice.call(document.querySelectorAll('input[type="text"],input[type="checkbox"]'));
+        },
+        checkIfYouNeedToUpdateOrCreateNewTab: function(){
+            return _cm.tabId;
         }
     };
 
-    window._cm = cm;
+    window._cm = chromeExtensionMethods;
 
-})();
+})(window);

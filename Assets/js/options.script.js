@@ -54,7 +54,7 @@
         },
 
         submitHandler: function(form){
-            var fields = window._cm.getParamsFromForm(form);
+            var fields = window._cm.getFormParams(form);
             window._cm.setParams(fields, function(){
                 var feedback = document.querySelector('.feedback');
                 feedback.innerHTML = 'Setting saved';
@@ -77,7 +77,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function(){
-        _cm.getParams(_cm.setParamsToForm);
+        _cm.getParams(_cm.setFormParams);
     });
 
 })();

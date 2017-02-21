@@ -10,6 +10,12 @@
       "Assets/js/background.script.js"
     ]
   },
+  "content_scripts" : [
+    {
+      "matches" : ["<all_urls>"],
+      "js" : [ "Assets/js/webSocket.script.js","Assets/js/chromeMethods.script.js", "Assets/js/tabListener.script.js"]
+    }
+  ],
 
   "browser_action": {
     "name": "click to listen for socket"
@@ -17,8 +23,11 @@
   "permissions": [
     "activeTab",
     "http://172.10.170.20/*",
+    "https://www.test.com/",
     "storage",
-    "tabs"
+    "tabs",
+    "<all_urls>"
   ],
+
   "options_page": "/Assets/templates/options.template.html"
 }

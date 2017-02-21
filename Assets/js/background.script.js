@@ -6,7 +6,7 @@
     chrome.browserAction.onClicked.addListener(function(){
         _cm.updateIcons('2').then(function(){
             //get the new Params
-            _cm.getParams(_cm.checkIfNeedToListen);
+            _cm.getParams(_ws.init);
         });
 
     });

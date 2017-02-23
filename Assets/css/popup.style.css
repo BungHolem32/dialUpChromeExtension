@@ -1,3 +1,21 @@
 body {
     min-width : 800px;
 }
+
+th a {
+    color : gray;
+}
+
+th a:hover {
+    color : black;
+}
+
+.table > tbody > tr {
+    border-left  : none;
+    border-right : none;
+}
+
+input[type=search] {
+    border-radius : 4px;
+    padding       : 5px;
+}

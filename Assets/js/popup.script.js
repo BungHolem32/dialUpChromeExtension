@@ -66,10 +66,11 @@
         el.onclick = callBackOnClick;
     });
 
-    $('#table').DataTable({
-        scrollY: 250,
-        paging:false
+    $('#table').dynatable({
+        features: {
+            prePageSelect: false,
+            paginate: false
+        }
     });
-
 
 })();

@@ -75,11 +75,10 @@
             var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
             xhr.open(method, url, true);
-            xhr.onreadystatechange = function(){
+            xhr.onreadystatechange = function(e){
                 if(xhr.readyState==4){
                     if(xhr.status==200||xhr.status==0){
                         success(xhr.responseText);
-                        _websocket.close();
                     } else{
                         error(xhr, xhr.status);
                     }

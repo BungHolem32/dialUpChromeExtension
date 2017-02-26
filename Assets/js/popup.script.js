@@ -2,10 +2,19 @@
  * Created by ilanv on 20/02/2017.
  */
 
+
 (function(){
+
+
+    $('#table').DataTable({
+        paging: false,
+        length: 180
+    });
 
     //FOR ADD EVENT LISTENER I HAD TO CREATE ARRAY OF BUTTON AND ITERATE OVER THEM
     var buttons = Array.prototype.slice.call(document.querySelectorAll('.button'));
+
+    console.log(buttons);
     var callBackOnClick = function(){
 
         //FILTER THE LEADS DETAIL AND CREATE OBJECT WITH ALL SPECIFIC DATA
@@ -66,11 +75,5 @@
         el.onclick = callBackOnClick;
     });
 
-    $('#table').dynatable({
-        features: {
-            prePageSelect: false,
-            paginate: false
-        }
-    });
 
 })();

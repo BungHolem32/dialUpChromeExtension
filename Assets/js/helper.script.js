@@ -5,6 +5,7 @@
     var helper = {
         genUrl: function(apiUrl, extension, phone){
             return apiUrl + "?exten=" + encodeURI(extension) + "&number=" + phone;
+
         },
         genObject: function(params){
             var object = {};
@@ -22,10 +23,10 @@
             var params = {};
             if(fields.length==0){
                 return {
-                    "socketUrl": true,
-                    "apiUrl": true,
-                    "extension": true,
-                    "disableButton": true
+                    "socketUrl": "localhost:8886",
+                    "apiUrl": "http://172.10.170.20/dailer.php",
+                    "extension": "SIP/2004",
+                    "disableButton": false
                 }
             }
 
@@ -58,7 +59,7 @@
             inputs.map(function(field){
                 var name = field.getAttribute('name');
                 document.querySelector("#" + name).value = items[name];
-                if(name!=this.disableButtonSelector&&name!='extension'){
+                if(name!=this.disableButtonSelector&&name=='socketUrl'){
                     document.querySelector("#" + name).disabled = items[this.disableButtonSelector]==true;
                 } else{
                     if(field.value=="true"){
@@ -97,19 +98,19 @@
 
             switch(status){
                 case 404:
-                    console.warn('Unknown extension');
+                    alert('Unknown extension');
                     break;
                 case 500:
-                    console.warn('server error');
+                    alert('server error');
                     break;
                 case 0:
-                    console.warn('Request aborted: Unknown extension');
+                    alert('Request aborted: Unknown extension');
                     break;
                 default:
-                    console.warn('unknown error');
+                    alert('unknown error');
             }
         }
-    }
+    };
 
     window._h = helper;
 })(window);

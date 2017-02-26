@@ -6,6 +6,7 @@
     chrome.runtime.onMessage.addListener(function(message){
         message = JSON.parse(message);
         var url = _h.genUrl(message['apiUrl'], message['extension'], message['phone']);
+        console.log(url);
         _h.makeAjaxCall('GET', url, null, _h.getAjaxSuccessCallback, _h.getAjaxErrorMessages, false);
     })
 })();

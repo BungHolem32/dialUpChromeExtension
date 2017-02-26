@@ -12,7 +12,7 @@
     disableCheckbox.on('click', function(){
 
         var checkboxButton = this;
-        $('.formOptions input[type="text"]').each(function(key, elem){
+        $('.formOptions #socketUrl').each(function(key, elem){
             if($(checkboxButton).is(":checked")){
                 $(elem).attr('disabled', 'disabled');
             }
@@ -55,7 +55,7 @@
 
         submitHandler: function(form){
             var fields = _h.getFormParams('input[type="text"],input[type="checkbox"]');
-              _cm.setParams(fields, function(){
+            _cm.setParams(fields, function(){
                 var feedback = document.querySelector('.feedback');
                 feedback.innerHTML = 'Setting saved';
 
@@ -77,7 +77,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function(){
-        _cm.getParams(_h.setFormParams,'input[type="text"],input[type="checkbox"]');
+        _cm.getParams(_h.setFormParams, 'input[type="text"],input[type="checkbox"]');
     });
 
 

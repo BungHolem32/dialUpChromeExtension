@@ -8,6 +8,7 @@
 
     $('#table').DataTable({
         paging: false,
+        info: false,
         length: 180
     });
 

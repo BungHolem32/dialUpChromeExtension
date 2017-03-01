@@ -1,4 +1,6 @@
 (function(){
+
+
     //ON-LOAD SET ICON TO SAD-FACE(DISCONNECTED)
     _cm.updateIcons('1');
 

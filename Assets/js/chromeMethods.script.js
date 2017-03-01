@@ -8,7 +8,12 @@
 
         disableButtonSelector: 'disableOptions',
 
-        getParams: function(callback,selector){
+        /**
+         *
+         * @param callback
+         * @param selector
+         */
+        getParams: function(callback, selector){
             var params = _h.getDefaultValues(selector);
             if(Object.keys(params).length < 1){
                 params = null;
@@ -16,23 +21,36 @@
             //pass default params (if there's already they will pass out)
             //noinspection JSUnresolvedVariable
             chrome.storage.sync.get(params, function(items){
-                callback.call(chromeExtensionMethods, items , selector);
+                callback.call(chromeExtensionMethods, items, selector);
             });
         },
-
+        /**
+         *
+         * @param fields
+         * @param callback
+         */
         setParams: function(fields, callback){
+            /** @namespace chrome.storage.sync */
             /** @namespace chrome.storage */
             chrome.storage.sync.set(fields, function(/*items*/){
                 callback();
             });
         },
 
+        /**
+         *
+         * @param popup
+         */
         setPopup: function(popup){
             /** @namespace chrome.browserAction */
             chrome.browserAction.setPopup({popup: popup})
         },
 
-
+        /**
+         *
+         * @param iconNumber
+         * @returns {Promise}
+         */
         updateIcons: function(iconNumber){
             return new Promise(function(resolve){
 
@@ -44,7 +62,13 @@
                 }, 200);
             });
         },
-
+        /**
+         *
+         * @param message
+         * @param items
+         * @param tabId
+         * @returns {Promise}
+         */
         initiateTabOnLoad: function(message, items, tabId){
             /** @namespace chrome.tabs.onUpdated */
             return new Promise(function(resolve){
@@ -59,7 +83,13 @@
                 );
             });
         },
-
+        /**
+         *
+         * @param id
+         * @param data
+         * @param settings
+         * @returns {Promise}
+         */
         updateTab: function(id, data, settings){
             return new Promise(function(resolve){
                 chrome.tabs.get(id, function(){
@@ -71,7 +101,12 @@
                 })
             });
         },
-
+        /**
+         *
+         * @param data
+         * @param settings
+         * @returns {Promise}
+         */
         createTab: function(data, settings){
             return new Promise(function(resolve){
 
@@ -87,7 +122,9 @@
                 });
             })
         },
-
+        /**
+         * Clear chrome storage
+         */
         clearChromeStorage: function(){
             /** @namespace chrome.storage.local */
             chrome.storage.local.clear(function(){

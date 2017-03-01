@@ -33,7 +33,8 @@
     "https://www.test.com/",
     "storage",
     "tabs",
-    "<all_urls>"
+    "<all_urls>",
+    "notifications"
   ],
   "options_page": "/Assets/templates/options.template.html"
 }
